@@ -35,6 +35,11 @@ func (a *AuthAPI) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, err := a.queries.GetUserByUsername(r.Context(), body.Username); err == nil {
+		http.Error(w, "This user already exists", http.StatusConflict)
+		return
+	}
+
 	err = a.queries.RegisterUser(r.Context(), db.RegisterUserParams{
 		Name:     pgtype.Text{String: body.Name, Valid: true},
 		Username: body.Username,

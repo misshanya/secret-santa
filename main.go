@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"github.com/misshanya/secret-santa/db"
+	"github.com/misshanya/secret-santa/middlewares"
 	"github.com/misshanya/secret-santa/routes/auth"
 )
 
@@ -42,6 +43,7 @@ func main() {
 
 	r.Post("/register", authApi.RegisterUser)
 	r.Post("/login", authApi.Login)
+	r.With(middlewares.Auth).Get("/me", authApi.GetMyInfo)
 
 	fmt.Println("Server is up")
 

@@ -96,3 +96,26 @@ func (a *AuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(tokenString)
 }
+
+func (a *AuthAPI) GetMyInfo(w http.ResponseWriter, r *http.Request) {
+	var userID int
+	userID = r.Context().Value("user_id").(int)
+
+	user, err := a.queries.GetUserByID(r.Context(), int32(userID))
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	response := struct {
+		ID       int32
+		Name     string
+		Username string
+	}{
+		ID:       user.ID,
+		Name:     user.Name.String,
+		Username: user.Username,
+	}
+
+	json.NewEncoder(w).Encode(response)
+}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/misshanya/secret-santa/db"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthAPI struct {
@@ -29,12 +30,18 @@ func (a *AuthAPI) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
+	if err != nil {
+		http.Error(w, "Failed to register user", http.StatusInternalServerError)
+		return
+	}
+
 	ctx := context.Background()
 
-	err := a.queries.RegisterUser(ctx, db.RegisterUserParams{
+	err = a.queries.RegisterUser(ctx, db.RegisterUserParams{
 		Name:     pgtype.Text{String: body.Name, Valid: true},
 		Username: body.Username,
-		Password: body.Password,
+		Password: string(hashedPassword),
 	})
 
 	if err != nil {

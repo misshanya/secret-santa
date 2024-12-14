@@ -3,7 +3,9 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/misshanya/secret-santa/db"
 )
@@ -37,16 +39,14 @@ func (a *RoomsAPI) CreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *RoomsAPI) DeleteRoom(w http.ResponseWriter, r *http.Request) {
-	var body struct {
-		ID int
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	roomID32 := int32(roomID)
+	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	room, err := a.queries.GetRoomByID(r.Context(), int32(body.ID))
+	room, err := a.queries.GetRoomByID(r.Context(), roomID32)
 	if err != nil {
 		http.Error(w, "This room does not exists", http.StatusNotFound)
 		return
@@ -57,5 +57,5 @@ func (a *RoomsAPI) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.queries.DeleteRoom(r.Context(), int32(body.ID))
+	a.queries.DeleteRoom(r.Context(), roomID32)
 }

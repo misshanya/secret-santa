@@ -47,7 +47,7 @@ func main() {
 	r.With(middlewares.Auth).Get("/me", authApi.GetMyInfo)
 
 	r.With(middlewares.Auth).Post("/room", roomsApi.CreateRoom)
-	r.With(middlewares.Auth).Delete("/room", roomsApi.DeleteRoom)
+	r.With(middlewares.Auth).Delete("/room/{id}", roomsApi.DeleteRoom)
 
 	fmt.Println("Server is up")
 

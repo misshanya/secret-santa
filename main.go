@@ -13,7 +13,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/misshanya/secret-santa/db"
 	"github.com/misshanya/secret-santa/middlewares"
-	"github.com/misshanya/secret-santa/routes/auth"
+	"github.com/misshanya/secret-santa/routes"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 
 	queries := db.New(conn)
 
-	authApi := auth.NewAuthAPI(queries)
+	authApi := routes.NewAuthAPI(queries)
 
 	r.Post("/register", authApi.RegisterUser)
 	r.Post("/login", authApi.Login)

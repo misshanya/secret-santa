@@ -41,6 +41,7 @@ func main() {
 	authApi := auth.NewAuthAPI(queries)
 
 	r.Post("/register", authApi.RegisterUser)
+	r.Post("/login", authApi.Login)
 
 	fmt.Println("Server is up")
 

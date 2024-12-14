@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -36,9 +35,7 @@ func (a *AuthAPI) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := context.Background()
-
-	err = a.queries.RegisterUser(ctx, db.RegisterUserParams{
+	err = a.queries.RegisterUser(r.Context(), db.RegisterUserParams{
 		Name:     pgtype.Text{String: body.Name, Valid: true},
 		Username: body.Username,
 		Password: string(hashedPassword),

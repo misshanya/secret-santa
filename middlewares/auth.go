@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,12 +13,12 @@ import (
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Token"] == nil {
+		if r.Header["Authorization"] == nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		tokenString := r.Header.Get("Token")
+		tokenString := getTokenFromHeader(r.Header.Get("Authorization"))
 		token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -45,4 +46,8 @@ func Auth(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized: Invalid token", http.StatusUnauthorized)
 		}
 	})
+}
+
+func getTokenFromHeader(AuthHeader string) string {
+	return strings.Split(AuthHeader, " ")[1]
 }

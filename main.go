@@ -42,5 +42,7 @@ func main() {
 
 	r.Post("/register", authApi.RegisterUser)
 
+	fmt.Println("Server is up")
+
 	http.ListenAndServe(fmt.Sprintf(":%v", serverPort), r)
 }

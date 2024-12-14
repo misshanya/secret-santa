@@ -40,10 +40,14 @@ func main() {
 	queries := db.New(conn)
 
 	authApi := routes.NewAuthAPI(queries)
+	roomsApi := routes.NewRoomsAPI(queries)
 
 	r.Post("/register", authApi.RegisterUser)
 	r.Post("/login", authApi.Login)
 	r.With(middlewares.Auth).Get("/me", authApi.GetMyInfo)
+
+	r.With(middlewares.Auth).Post("/room", roomsApi.CreateRoom)
+	r.With(middlewares.Auth).Delete("/room", roomsApi.DeleteRoom)
 
 	fmt.Println("Server is up")
 

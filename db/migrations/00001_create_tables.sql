@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS participants (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE users;
-DROP TABLE rooms;
 DROP TABLE participants;
+DROP TABLE rooms;
+DROP TABLE users;
 -- +goose StatementEnd

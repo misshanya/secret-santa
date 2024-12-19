@@ -108,9 +108,9 @@ func (a *AuthAPI) GetMyInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := struct {
-		ID       int32
-		Name     string
-		Username string
+		ID       int32  `json:"id"`
+		Name     string `json:"name"`
+		Username string `json:"username"`
 	}{
 		ID:       user.ID,
 		Name:     user.Name.String,

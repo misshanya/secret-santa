@@ -24,7 +24,7 @@ INSERT INTO rooms (
 `
 
 type CreateRoomParams struct {
-	OwnerID     int32
+	OwnerID     int64
 	Name        pgtype.Text
 	Description pgtype.Text
 }
@@ -39,7 +39,7 @@ DELETE FROM rooms
 WHERE id = $1
 `
 
-func (q *Queries) DeleteRoom(ctx context.Context, id int32) error {
+func (q *Queries) DeleteRoom(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, deleteRoom, id)
 	return err
 }
@@ -49,7 +49,7 @@ SELECT id, owner_id, name, description, max_participants, created_at FROM rooms
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetRoomByID(ctx context.Context, id int32) (Room, error) {
+func (q *Queries) GetRoomByID(ctx context.Context, id int64) (Room, error) {
 	row := q.db.QueryRow(ctx, getRoomByID, id)
 	var i Room
 	err := row.Scan(
@@ -68,7 +68,7 @@ SELECT id, owner_id, name, description, max_participants, created_at FROM rooms
 WHERE owner_id = $1
 `
 
-func (q *Queries) GetUserRooms(ctx context.Context, ownerID int32) ([]Room, error) {
+func (q *Queries) GetUserRooms(ctx context.Context, ownerID int64) ([]Room, error) {
 	rows, err := q.db.Query(ctx, getUserRooms, ownerID)
 	if err != nil {
 		return nil, err

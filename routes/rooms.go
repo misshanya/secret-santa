@@ -30,7 +30,7 @@ func (a *RoomsAPI) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.queries.CreateRoom(r.Context(), db.CreateRoomParams{
-		OwnerID:     int32(r.Context().Value("user_id").(int)),
+		OwnerID:     int64(r.Context().Value("user_id").(int)),
 		Name:        pgtype.Text{String: body.Name, Valid: true},
 		Description: pgtype.Text{String: body.Description, Valid: true},
 	})
@@ -40,22 +40,21 @@ func (a *RoomsAPI) CreateRoom(w http.ResponseWriter, r *http.Request) {
 
 func (a *RoomsAPI) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
-	roomID32 := int32(roomID)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	room, err := a.queries.GetRoomByID(r.Context(), roomID32)
+	room, err := a.queries.GetRoomByID(r.Context(), int64(roomID))
 	if err != nil {
 		http.Error(w, "This room does not exists", http.StatusNotFound)
 		return
 	}
 
-	if room.OwnerID != int32(r.Context().Value("user_id").(int)) {
+	if room.OwnerID != int64(r.Context().Value("user_id").(int)) {
 		http.Error(w, "You are not allowed to do this", http.StatusForbidden)
 		return
 	}
 
-	a.queries.DeleteRoom(r.Context(), roomID32)
+	a.queries.DeleteRoom(r.Context(), int64(roomID))
 }

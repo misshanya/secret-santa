@@ -9,15 +9,15 @@ import (
 )
 
 type Participant struct {
-	ID     int32
-	UserID int32
-	RoomID int32
+	ID     int64
+	UserID int64
+	RoomID int64
 	Wish   pgtype.Text
 }
 
 type Room struct {
-	ID              int32
-	OwnerID         int32
+	ID              int64
+	OwnerID         int64
 	Name            pgtype.Text
 	Description     pgtype.Text
 	MaxParticipants pgtype.Int4
@@ -25,7 +25,7 @@ type Room struct {
 }
 
 type User struct {
-	ID           int32
+	ID           int64
 	Name         pgtype.Text
 	Username     string
 	Password     string

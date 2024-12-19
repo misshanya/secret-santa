@@ -24,8 +24,8 @@ INSERT INTO participants (
 `
 
 type CreateParticipantParams struct {
-	UserID int32
-	RoomID int32
+	UserID int64
+	RoomID int64
 	Wish   pgtype.Text
 }
 
@@ -39,7 +39,7 @@ DELETE FROM participants
 WHERE id = $1
 `
 
-func (q *Queries) DeleteParticipant(ctx context.Context, id int32) error {
+func (q *Queries) DeleteParticipant(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, deleteParticipant, id)
 	return err
 }
@@ -49,7 +49,7 @@ SELECT id, user_id, room_id, wish FROM participants
 WHERE id = $1
 `
 
-func (q *Queries) GetParticipantByID(ctx context.Context, id int32) (Participant, error) {
+func (q *Queries) GetParticipantByID(ctx context.Context, id int64) (Participant, error) {
 	row := q.db.QueryRow(ctx, getParticipantByID, id)
 	var i Participant
 	err := row.Scan(
@@ -67,8 +67,8 @@ WHERE user_id = $1 AND room_id = $2
 `
 
 type GetParticipantByUserIDParams struct {
-	UserID int32
-	RoomID int32
+	UserID int64
+	RoomID int64
 }
 
 func (q *Queries) GetParticipantByUserID(ctx context.Context, arg GetParticipantByUserIDParams) (Participant, error) {
@@ -88,7 +88,7 @@ SELECT id, user_id, room_id, wish FROM participants
 WHERE user_id = $1
 `
 
-func (q *Queries) GetUserParticipations(ctx context.Context, userID int32) ([]Participant, error) {
+func (q *Queries) GetUserParticipations(ctx context.Context, userID int64) ([]Participant, error) {
 	rows, err := q.db.Query(ctx, getUserParticipations, userID)
 	if err != nil {
 		return nil, err
@@ -121,8 +121,8 @@ WHERE user_id = $2 AND room_id = $3
 
 type UpdateParticipiantWishParams struct {
 	Wish   pgtype.Text
-	UserID int32
-	RoomID int32
+	UserID int64
+	RoomID int64
 }
 
 func (q *Queries) UpdateParticipiantWish(ctx context.Context, arg UpdateParticipiantWishParams) error {

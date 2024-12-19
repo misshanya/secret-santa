@@ -98,17 +98,16 @@ func (a *AuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *AuthAPI) GetMyInfo(w http.ResponseWriter, r *http.Request) {
-	var userID int
-	userID = r.Context().Value("user_id").(int)
+	userID := int64(r.Context().Value("user_id").(int))
 
-	user, err := a.queries.GetUserByID(r.Context(), int32(userID))
+	user, err := a.queries.GetUserByID(r.Context(), userID)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	response := struct {
-		ID       int32  `json:"id"`
+		ID       int64  `json:"id"`
 		Name     string `json:"name"`
 		Username string `json:"username"`
 	}{

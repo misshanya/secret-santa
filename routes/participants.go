@@ -24,11 +24,11 @@ func (a *ParticipantsAPI) NewParticipant(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	UserID := int32(r.Context().Value("user_id").(int))
+	UserID := int64(r.Context().Value("user_id").(int))
 
 	a.queries.CreateParticipant(r.Context(), db.CreateParticipantParams{
 		UserID: UserID,
-		RoomID: int32(roomID),
+		RoomID: int64(roomID),
 	})
 
 	w.WriteHeader(http.StatusCreated)
@@ -40,11 +40,11 @@ func (a *ParticipantsAPI) GetWish(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	UserID := int32(r.Context().Value("user_id").(int))
+	UserID := int64(r.Context().Value("user_id").(int))
 
 	participant, err := a.queries.GetParticipantByUserID(r.Context(), db.GetParticipantByUserIDParams{
 		UserID: UserID,
-		RoomID: int32(roomID),
+		RoomID: int64(roomID),
 	})
 	if err != nil {
 		http.Error(w, "You are not member of this room", http.StatusNotFound)
@@ -66,7 +66,7 @@ func (a *ParticipantsAPI) SetWish(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	userID := int32(r.Context().Value("user_id").(int))
+	userID := int64(r.Context().Value("user_id").(int))
 
 	var body struct {
 		Wish string
@@ -79,7 +79,7 @@ func (a *ParticipantsAPI) SetWish(w http.ResponseWriter, r *http.Request) {
 
 	_, err = a.queries.GetParticipantByUserID(r.Context(), db.GetParticipantByUserIDParams{
 		UserID: userID,
-		RoomID: int32(roomID),
+		RoomID: int64(roomID),
 	})
 	if err != nil {
 		http.Error(w, "You are not a member of this room", http.StatusNotFound)
@@ -89,7 +89,7 @@ func (a *ParticipantsAPI) SetWish(w http.ResponseWriter, r *http.Request) {
 	a.queries.UpdateParticipiantWish(r.Context(), db.UpdateParticipiantWishParams{
 		Wish:   pgtype.Text{String: body.Wish, Valid: true},
 		UserID: userID,
-		RoomID: int32(roomID),
+		RoomID: int64(roomID),
 	})
 }
 
@@ -99,18 +99,17 @@ func (a *ParticipantsAPI) DeleteParticipant(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	roomID32 := int32(roomID)
 
 	participant, err := a.queries.GetParticipantByUserID(r.Context(), db.GetParticipantByUserIDParams{
-		UserID: int32(r.Context().Value("user_id").(int)),
-		RoomID: roomID32,
+		UserID: int64(r.Context().Value("user_id").(int)),
+		RoomID: int64(roomID),
 	})
 	if err != nil {
 		http.Error(w, "This participant does not exists", http.StatusNotFound)
 		return
 	}
 
-	if participant.UserID != int32(r.Context().Value("user_id").(int)) {
+	if participant.UserID != int64(r.Context().Value("user_id").(int)) {
 		http.Error(w, "You are not allowed to do this", http.StatusForbidden)
 		return
 	}

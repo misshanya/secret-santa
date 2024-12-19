@@ -41,6 +41,7 @@ func main() {
 
 	authApi := routes.NewAuthAPI(queries)
 	roomsApi := routes.NewRoomsAPI(queries)
+	participantsAPI := routes.NewParticipantsAPI(queries)
 
 	r.Post("/register", authApi.RegisterUser)
 	r.Post("/login", authApi.Login)
@@ -48,6 +49,11 @@ func main() {
 
 	r.With(middlewares.Auth).Post("/room", roomsApi.CreateRoom)
 	r.With(middlewares.Auth).Delete("/room/{id}", roomsApi.DeleteRoom)
+
+	r.With(middlewares.Auth).Post("/room/{id}/join", participantsAPI.NewParticipant)
+	r.With(middlewares.Auth).Get("/room/{id}/wish", participantsAPI.GetWish)
+	r.With(middlewares.Auth).Patch("/room/{id}/wish", participantsAPI.SetWish)
+	r.With(middlewares.Auth).Delete("/room/{id}/exit", participantsAPI.DeleteParticipant)
 
 	fmt.Println("Server is up")
 

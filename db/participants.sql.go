@@ -61,6 +61,28 @@ func (q *Queries) GetParticipantByID(ctx context.Context, id int32) (Participant
 	return i, err
 }
 
+const getParticipantByUserID = `-- name: GetParticipantByUserID :one
+SELECT id, user_id, room_id, wish FROM participants
+WHERE user_id = $1 AND room_id = $2
+`
+
+type GetParticipantByUserIDParams struct {
+	UserID int32
+	RoomID int32
+}
+
+func (q *Queries) GetParticipantByUserID(ctx context.Context, arg GetParticipantByUserIDParams) (Participant, error) {
+	row := q.db.QueryRow(ctx, getParticipantByUserID, arg.UserID, arg.RoomID)
+	var i Participant
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RoomID,
+		&i.Wish,
+	)
+	return i, err
+}
+
 const getUserParticipations = `-- name: GetUserParticipations :many
 SELECT id, user_id, room_id, wish FROM participants
 WHERE user_id = $1
@@ -89,4 +111,21 @@ func (q *Queries) GetUserParticipations(ctx context.Context, userID int32) ([]Pa
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateParticipiantWish = `-- name: UpdateParticipiantWish :exec
+UPDATE participants
+SET wish = $1
+WHERE user_id = $2 AND room_id = $3
+`
+
+type UpdateParticipiantWishParams struct {
+	Wish   pgtype.Text
+	UserID int32
+	RoomID int32
+}
+
+func (q *Queries) UpdateParticipiantWish(ctx context.Context, arg UpdateParticipiantWishParams) error {
+	_, err := q.db.Exec(ctx, updateParticipiantWish, arg.Wish, arg.UserID, arg.RoomID)
+	return err
 }

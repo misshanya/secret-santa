@@ -40,10 +40,10 @@ func (a *ParticipantsAPI) GetWish(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	UserID := int64(r.Context().Value("user_id").(int))
+	userID := int64(r.Context().Value("user_id").(int))
 
 	participant, err := a.queries.GetParticipantByUserID(r.Context(), db.GetParticipantByUserIDParams{
-		UserID: UserID,
+		UserID: userID,
 		RoomID: int64(roomID),
 	})
 	if err != nil {

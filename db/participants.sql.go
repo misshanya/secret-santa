@@ -45,7 +45,7 @@ func (q *Queries) DeleteParticipant(ctx context.Context, id int64) error {
 }
 
 const getParticipantByID = `-- name: GetParticipantByID :one
-SELECT id, user_id, room_id, wish FROM participants
+SELECT id, user_id, room_id, wish, gives_to FROM participants
 WHERE id = $1
 `
 
@@ -57,12 +57,13 @@ func (q *Queries) GetParticipantByID(ctx context.Context, id int64) (Participant
 		&i.UserID,
 		&i.RoomID,
 		&i.Wish,
+		&i.GivesTo,
 	)
 	return i, err
 }
 
 const getParticipantByUserID = `-- name: GetParticipantByUserID :one
-SELECT id, user_id, room_id, wish FROM participants
+SELECT id, user_id, room_id, wish, gives_to FROM participants
 WHERE user_id = $1 AND room_id = $2
 `
 
@@ -79,12 +80,13 @@ func (q *Queries) GetParticipantByUserID(ctx context.Context, arg GetParticipant
 		&i.UserID,
 		&i.RoomID,
 		&i.Wish,
+		&i.GivesTo,
 	)
 	return i, err
 }
 
 const getUserParticipations = `-- name: GetUserParticipations :many
-SELECT id, user_id, room_id, wish FROM participants
+SELECT id, user_id, room_id, wish, gives_to FROM participants
 WHERE user_id = $1
 `
 
@@ -102,6 +104,7 @@ func (q *Queries) GetUserParticipations(ctx context.Context, userID int64) ([]Pa
 			&i.UserID,
 			&i.RoomID,
 			&i.Wish,
+			&i.GivesTo,
 		); err != nil {
 			return nil, err
 		}

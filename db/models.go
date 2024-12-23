@@ -9,10 +9,11 @@ import (
 )
 
 type Participant struct {
-	ID     int64
-	UserID int64
-	RoomID int64
-	Wish   pgtype.Text
+	ID      int64
+	UserID  int64
+	RoomID  int64
+	Wish    pgtype.Text
+	GivesTo pgtype.Int8
 }
 
 type Room struct {

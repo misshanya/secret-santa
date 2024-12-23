@@ -14,8 +14,10 @@ SELECT * FROM rooms
 WHERE id = $1 LIMIT 1;
 
 -- name: GetUserRooms :many
-SELECT * FROM rooms
-WHERE owner_id = $1;
+SELECT id, name, description, max_participants, created_at 
+FROM rooms
+WHERE owner_id = $1
+ORDER BY created_at DESC;
 
 -- name: DeleteRoom :exec
 DELETE FROM rooms

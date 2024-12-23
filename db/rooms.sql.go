@@ -64,22 +64,31 @@ func (q *Queries) GetRoomByID(ctx context.Context, id int64) (Room, error) {
 }
 
 const getUserRooms = `-- name: GetUserRooms :many
-SELECT id, owner_id, name, description, max_participants, created_at FROM rooms
+SELECT id, name, description, max_participants, created_at 
+FROM rooms
 WHERE owner_id = $1
+ORDER BY created_at DESC
 `
 
-func (q *Queries) GetUserRooms(ctx context.Context, ownerID int64) ([]Room, error) {
+type GetUserRoomsRow struct {
+	ID              int64
+	Name            pgtype.Text
+	Description     pgtype.Text
+	MaxParticipants pgtype.Int4
+	CreatedAt       pgtype.Timestamp
+}
+
+func (q *Queries) GetUserRooms(ctx context.Context, ownerID int64) ([]GetUserRoomsRow, error) {
 	rows, err := q.db.Query(ctx, getUserRooms, ownerID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Room
+	var items []GetUserRoomsRow
 	for rows.Next() {
-		var i Room
+		var i GetUserRoomsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.OwnerID,
 			&i.Name,
 			&i.Description,
 			&i.MaxParticipants,

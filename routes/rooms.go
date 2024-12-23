@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -36,6 +37,40 @@ func (a *RoomsAPI) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	})
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+type RoomResponse struct {
+	ID              int64  `json:"id"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	MaxParticipants int32  `json:"max_participants"`
+	CreatedAt       string `json:"created_at"`
+}
+
+func (a *RoomsAPI) MyRooms(w http.ResponseWriter, r *http.Request) {
+	userID := int64(r.Context().Value("user_id").(int))
+
+	rooms, err := a.queries.GetUserRooms(r.Context(), userID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var response struct {
+		Rooms []RoomResponse `json:"rooms"`
+	}
+
+	for _, room := range rooms {
+		response.Rooms = append(response.Rooms, RoomResponse{
+			ID:              room.ID,
+			Name:            room.Name.String,
+			Description:     room.Description.String,
+			MaxParticipants: room.MaxParticipants.Int32,
+			CreatedAt:       room.CreatedAt.Time.Format(time.RFC3339),
+		})
+	}
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func (a *RoomsAPI) DeleteRoom(w http.ResponseWriter, r *http.Request) {

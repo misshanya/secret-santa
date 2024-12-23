@@ -48,6 +48,7 @@ func main() {
 	r.With(middlewares.Auth).Get("/me", authApi.GetMyInfo)
 
 	r.With(middlewares.Auth).Post("/room", roomsApi.CreateRoom)
+	r.With(middlewares.Auth).Get("/room", roomsApi.MyRooms)
 	r.With(middlewares.Auth).Delete("/room/{id}", roomsApi.DeleteRoom)
 
 	r.With(middlewares.Auth).Post("/room/{id}/join", participantsAPI.NewParticipant)

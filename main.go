@@ -51,10 +51,10 @@ func main() {
 	r.With(middlewares.Auth).Get("/rooms", roomsApi.MyRooms)
 	r.With(middlewares.Auth).Delete("/rooms/{id}", roomsApi.DeleteRoom)
 
-	r.With(middlewares.Auth).Post("/rooms/{id}/join", participantsAPI.NewParticipant)
+	r.With(middlewares.Auth).Post("/rooms/{id}/participants", participantsAPI.NewParticipant)
+	r.With(middlewares.Auth).Delete("/rooms/{id}/participants/me", participantsAPI.DeleteParticipant)
 	r.With(middlewares.Auth).Get("/rooms/{id}/wish", participantsAPI.GetWish)
 	r.With(middlewares.Auth).Patch("/rooms/{id}/wish", participantsAPI.SetWish)
-	r.With(middlewares.Auth).Delete("/rooms/{id}/exit", participantsAPI.DeleteParticipant)
 
 	fmt.Println("Server is up")
 

@@ -24,10 +24,10 @@ func (a *ParticipantsAPI) NewParticipant(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-	UserID := int64(r.Context().Value("user_id").(int))
+	userID := int64(r.Context().Value("user_id").(int))
 
 	a.queries.CreateParticipant(r.Context(), db.CreateParticipantParams{
-		UserID: UserID,
+		UserID: userID,
 		RoomID: int64(roomID),
 	})
 

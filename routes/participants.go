@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/misshanya/secret-santa/db"
 )
@@ -25,6 +26,18 @@ func (a *ParticipantsAPI) NewParticipant(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	userID := int64(r.Context().Value("user_id").(int))
+
+	_, err = a.queries.GetParticipantByUserID(r.Context(), db.GetParticipantByUserIDParams{
+		UserID: userID,
+		RoomID: int64(roomID),
+	})
+	if err == nil {
+		http.Error(w, "You are already in this room", http.StatusConflict)
+		return
+	} else if err != pgx.ErrNoRows {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	a.queries.CreateParticipant(r.Context(), db.CreateParticipantParams{
 		UserID: userID,

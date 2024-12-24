@@ -47,14 +47,14 @@ func main() {
 	r.Post("/login", authApi.Login)
 	r.With(middlewares.Auth).Get("/me", authApi.GetMyInfo)
 
-	r.With(middlewares.Auth).Post("/room", roomsApi.CreateRoom)
-	r.With(middlewares.Auth).Get("/room", roomsApi.MyRooms)
-	r.With(middlewares.Auth).Delete("/room/{id}", roomsApi.DeleteRoom)
+	r.With(middlewares.Auth).Post("/rooms", roomsApi.CreateRoom)
+	r.With(middlewares.Auth).Get("/rooms", roomsApi.MyRooms)
+	r.With(middlewares.Auth).Delete("/rooms/{id}", roomsApi.DeleteRoom)
 
-	r.With(middlewares.Auth).Post("/room/{id}/join", participantsAPI.NewParticipant)
-	r.With(middlewares.Auth).Get("/room/{id}/wish", participantsAPI.GetWish)
-	r.With(middlewares.Auth).Patch("/room/{id}/wish", participantsAPI.SetWish)
-	r.With(middlewares.Auth).Delete("/room/{id}/exit", participantsAPI.DeleteParticipant)
+	r.With(middlewares.Auth).Post("/rooms/{id}/join", participantsAPI.NewParticipant)
+	r.With(middlewares.Auth).Get("/rooms/{id}/wish", participantsAPI.GetWish)
+	r.With(middlewares.Auth).Patch("/rooms/{id}/wish", participantsAPI.SetWish)
+	r.With(middlewares.Auth).Delete("/rooms/{id}/exit", participantsAPI.DeleteParticipant)
 
 	fmt.Println("Server is up")
 

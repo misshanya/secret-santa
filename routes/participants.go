@@ -109,10 +109,5 @@ func (a *ParticipantsAPI) DeleteParticipant(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if participant.UserID != int64(r.Context().Value("user_id").(int)) {
-		http.Error(w, "You are not allowed to do this", http.StatusForbidden)
-		return
-	}
-
 	a.queries.DeleteParticipant(r.Context(), participant.ID)
 }

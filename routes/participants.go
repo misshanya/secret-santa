@@ -39,10 +39,15 @@ func (a *ParticipantsAPI) NewParticipant(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	a.queries.CreateParticipant(r.Context(), db.CreateParticipantParams{
+	err = a.queries.CreateParticipant(r.Context(), db.CreateParticipantParams{
 		UserID: userID,
 		RoomID: int64(roomID),
 	})
+
+	if err != nil {
+		http.Error(w, "Failed to enter room", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 }

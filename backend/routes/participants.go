@@ -181,6 +181,14 @@ func (a *ParticipantsAPI) DistributeParticipants(w http.ResponseWriter, r *http.
 	}
 }
 
+type ParticipantResponse struct {
+	ID      int64       `json:"id"`
+	UserID  int64       `json:"user_id"`
+	RoomID  int64       `json:"room_id"`
+	Wish    pgtype.Text `json:"wish"`
+	GivesTo pgtype.Int8 `json:"gives_to"`
+}
+
 func (a *ParticipantsAPI) GetParticipants(w http.ResponseWriter, r *http.Request) {
 	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -207,7 +215,11 @@ func (a *ParticipantsAPI) GetParticipants(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	participants := make([]db.Participant, len(participantsIDs))
+	var response struct {
+		Participants []ParticipantResponse `json:"participants"`
+	}
+
+	response.Participants = make([]ParticipantResponse, len(participantsIDs))
 
 	for i, ID := range participantsIDs {
 		participant, err := a.queries.GetParticipantByID(r.Context(), ID)
@@ -215,8 +227,14 @@ func (a *ParticipantsAPI) GetParticipants(w http.ResponseWriter, r *http.Request
 			http.Error(w, "Failed to get participant", http.StatusInternalServerError)
 			return
 		}
-		participants[i] = participant
+		response.Participants[i] = ParticipantResponse{
+			ID:      participant.ID,
+			UserID:  participant.UserID,
+			RoomID:  participant.RoomID,
+			Wish:    participant.Wish,
+			GivesTo: participant.GivesTo,
+		}
 	}
 
-	json.NewEncoder(w).Encode(participants)
+	json.NewEncoder(w).Encode(response)
 }

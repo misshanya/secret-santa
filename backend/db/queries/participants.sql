@@ -9,6 +9,16 @@ INSERT INTO participants (
     $3
 );
 
+-- name: GetAllParticipants :many
+SELECT id FROM participants
+WHERE room_id = $1
+ORDER BY id DESC;
+
+-- name: SetGivesTo :exec
+UPDATE participants
+SET gives_to = $1
+WHERE id = $2;
+
 -- name: GetParticipantByID :one
 SELECT * FROM participants
 WHERE id = $1;

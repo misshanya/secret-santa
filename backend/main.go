@@ -56,6 +56,8 @@ func main() {
 	r.With(middlewares.Auth).Get("/rooms/{id}/wish", participantsAPI.GetWish)
 	r.With(middlewares.Auth).Patch("/rooms/{id}/wish", participantsAPI.SetWish)
 
+	r.With(middlewares.Auth).Post("/rooms/{id}/participants/distribute", participantsAPI.DistributeParticipants)
+
 	fmt.Println("Server is up")
 
 	http.ListenAndServe(fmt.Sprintf(":%v", serverPort), r)

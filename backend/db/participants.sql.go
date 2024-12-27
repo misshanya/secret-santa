@@ -44,6 +44,32 @@ func (q *Queries) DeleteParticipant(ctx context.Context, id int64) error {
 	return err
 }
 
+const getAllParticipants = `-- name: GetAllParticipants :many
+SELECT id FROM participants
+WHERE room_id = $1
+ORDER BY id DESC
+`
+
+func (q *Queries) GetAllParticipants(ctx context.Context, roomID int64) ([]int64, error) {
+	rows, err := q.db.Query(ctx, getAllParticipants, roomID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getParticipantByID = `-- name: GetParticipantByID :one
 SELECT id, user_id, room_id, wish, gives_to FROM participants
 WHERE id = $1
@@ -114,6 +140,22 @@ func (q *Queries) GetUserParticipations(ctx context.Context, userID int64) ([]Pa
 		return nil, err
 	}
 	return items, nil
+}
+
+const setGivesTo = `-- name: SetGivesTo :exec
+UPDATE participants
+SET gives_to = $1
+WHERE id = $2
+`
+
+type SetGivesToParams struct {
+	GivesTo pgtype.Int8
+	ID      int64
+}
+
+func (q *Queries) SetGivesTo(ctx context.Context, arg SetGivesToParams) error {
+	_, err := q.db.Exec(ctx, setGivesTo, arg.GivesTo, arg.ID)
+	return err
 }
 
 const updateParticipiantWish = `-- name: UpdateParticipiantWish :exec

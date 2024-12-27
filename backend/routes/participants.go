@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -128,4 +129,54 @@ func (a *ParticipantsAPI) DeleteParticipant(w http.ResponseWriter, r *http.Reque
 	}
 
 	a.queries.DeleteParticipant(r.Context(), participant.ID)
+}
+
+func (a *ParticipantsAPI) DistributeParticipants(w http.ResponseWriter, r *http.Request) {
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	userID := int64(r.Context().Value("user_id").(int))
+
+	room, err := a.queries.GetRoomByID(r.Context(), int64(roomID))
+	if err != nil {
+		http.Error(w, "Room not found", http.StatusNotFound)
+		return
+	}
+
+	if userID != room.OwnerID {
+		http.Error(w, "You are not allowed to do this", http.StatusForbidden)
+		return
+	}
+
+	participantsIDs, err := a.queries.GetAllParticipants(r.Context(), int64(roomID))
+	if err != nil {
+		http.Error(w, "Failed to get participants", http.StatusInternalServerError)
+		return
+	}
+
+	if len(participantsIDs) < 2 {
+		http.Error(w, "Not enough participants to distribute", http.StatusBadRequest)
+		return
+	}
+
+	rand.Shuffle(len(participantsIDs), func(i, j int) {
+		participantsIDs[i], participantsIDs[j] = participantsIDs[j], participantsIDs[i]
+	})
+
+	for i, ID := range participantsIDs {
+		givesTo := participantsIDs[(i+1)%len(participantsIDs)]
+
+		err := a.queries.SetGivesTo(r.Context(), db.SetGivesToParams{
+			GivesTo: pgtype.Int8{Int64: givesTo, Valid: true},
+			ID:      ID,
+		})
+
+		if err != nil {
+			http.Error(w, "Failed to distribute participants", http.StatusInternalServerError)
+			return
+		}
+	}
 }

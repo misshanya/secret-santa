@@ -32,6 +32,16 @@ func (a *AuthAPI) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(body.Username) < 4 {
+		http.Error(w, "Username must be at least 4 characters long", http.StatusBadRequest)
+		return
+	}
+
+	if len(body.Password) < 8 {
+		http.Error(w, "Password must be at least 8 characters long", http.StatusBadRequest)
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 	if err != nil {
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)

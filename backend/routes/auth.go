@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -39,6 +40,13 @@ func (a *AuthAPI) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	if len(body.Password) < 8 {
 		http.Error(w, "Password must be at least 8 characters long", http.StatusBadRequest)
+		return
+	}
+
+	usernamePattern := "^[a-zA-Z0-9_-]+$"
+	match, _ := regexp.MatchString(usernamePattern, body.Username)
+	if !match {
+		http.Error(w, "Username contains invalid characters", http.StatusBadRequest)
 		return
 	}
 

@@ -180,3 +180,43 @@ func (a *ParticipantsAPI) DistributeParticipants(w http.ResponseWriter, r *http.
 		}
 	}
 }
+
+func (a *ParticipantsAPI) GetParticipants(w http.ResponseWriter, r *http.Request) {
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	userID := int64(r.Context().Value("user_id").(int))
+
+	room, err := a.queries.GetRoomByID(r.Context(), int64(roomID))
+	if err != nil {
+		http.Error(w, "Room not found", http.StatusNotFound)
+		return
+	}
+
+	if userID != room.OwnerID {
+		http.Error(w, "You are not allowed to do this", http.StatusForbidden)
+		return
+	}
+
+	participantsIDs, err := a.queries.GetAllParticipants(r.Context(), int64(roomID))
+	if err != nil {
+		http.Error(w, "Failed to get participants", http.StatusInternalServerError)
+		return
+	}
+
+	participants := make([]db.Participant, len(participantsIDs))
+
+	for i, ID := range participantsIDs {
+		participant, err := a.queries.GetParticipantByID(r.Context(), ID)
+		if err != nil {
+			http.Error(w, "Failed to get participant", http.StatusInternalServerError)
+			return
+		}
+		participants[i] = participant
+	}
+
+	json.NewEncoder(w).Encode(participants)
+}

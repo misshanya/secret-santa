@@ -91,5 +91,9 @@ func (a *RoomsAPI) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.queries.DeleteRoom(r.Context(), int64(roomID))
+	err = a.queries.DeleteRoom(r.Context(), int64(roomID))
+	if err != nil {
+		http.Error(w, "Failed to delete room", http.StatusInternalServerError)
+		return
+	}
 }

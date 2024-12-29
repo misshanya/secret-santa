@@ -82,11 +82,13 @@
 ```json
 {
   "rooms": [
-    "id": 1,
-    "name": "Комната 1",
-    "description": "Описание",
-    "max_participants": 30,
-    "created_at": "2024-12-29T10:15:46Z"
+    {
+      "id": 1,
+      "name": "Комната 1",
+      "description": "Описание",
+      "max_participants": 30,
+      "created_at": "2024-12-29T10:15:46Z"
+    }
   ]
 }
 ```

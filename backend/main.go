@@ -41,7 +41,7 @@ func main() {
 
 	authApi := routes.NewAuthAPI(queries)
 	roomsApi := routes.NewRoomsAPI(queries)
-	participantsAPI := routes.NewParticipantsAPI(queries)
+	participantsAPI := routes.NewParticipantsAPI(queries, conn)
 
 	r.Post("/register", authApi.RegisterUser)
 	r.Post("/login", authApi.Login)

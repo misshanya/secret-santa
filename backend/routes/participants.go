@@ -14,10 +14,11 @@ import (
 
 type ParticipantsAPI struct {
 	queries *db.Queries
+	conn    *pgx.Conn
 }
 
-func NewParticipantsAPI(queries *db.Queries) *ParticipantsAPI {
-	return &ParticipantsAPI{queries: queries}
+func NewParticipantsAPI(queries *db.Queries, conn *pgx.Conn) *ParticipantsAPI {
+	return &ParticipantsAPI{queries: queries, conn: conn}
 }
 
 func (a *ParticipantsAPI) NewParticipant(w http.ResponseWriter, r *http.Request) {
@@ -166,10 +167,18 @@ func (a *ParticipantsAPI) DistributeParticipants(w http.ResponseWriter, r *http.
 		participantsIDs[i], participantsIDs[j] = participantsIDs[j], participantsIDs[i]
 	})
 
+	tx, err := a.conn.Begin(r.Context())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer tx.Rollback(r.Context())
+	qtx := a.queries.WithTx(tx)
+
 	for i, ID := range participantsIDs {
 		givesTo := participantsIDs[(i+1)%len(participantsIDs)]
 
-		err := a.queries.SetGivesTo(r.Context(), db.SetGivesToParams{
+		err := qtx.SetGivesTo(r.Context(), db.SetGivesToParams{
 			GivesTo: pgtype.Int8{Int64: givesTo, Valid: true},
 			ID:      ID,
 		})
@@ -178,6 +187,11 @@ func (a *ParticipantsAPI) DistributeParticipants(w http.ResponseWriter, r *http.
 			http.Error(w, "Failed to distribute participants", http.StatusInternalServerError)
 			return
 		}
+	}
+
+	if err := tx.Commit(r.Context()); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 

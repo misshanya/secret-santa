@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/misshanya/secret-santa/config"
 )
 
 func Auth(next http.Handler) http.Handler {
@@ -24,7 +24,7 @@ func Auth(next http.Handler) http.Handler {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
 
-			return []byte(os.Getenv("JWT_SECRET")), nil
+			return []byte(config.GetConfig().JWTSecret), nil
 		})
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

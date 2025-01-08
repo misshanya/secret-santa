@@ -5,30 +5,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
-	"github.com/joho/godotenv"
+	"github.com/misshanya/secret-santa/config"
 	"github.com/misshanya/secret-santa/db"
 	"github.com/misshanya/secret-santa/middlewares"
 	"github.com/misshanya/secret-santa/routes"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	serverPort := os.Getenv("SERVER_PORT")
+
+	cfg := config.GetConfig()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, os.Getenv("DATABASE_URL"))
+	conn, err := pgx.Connect(ctx, cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal("could not connect to db")
 	}
@@ -58,5 +54,5 @@ func main() {
 
 	fmt.Println("Server is up")
 
-	http.ListenAndServe(fmt.Sprintf(":%v", serverPort), r)
+	http.ListenAndServe(fmt.Sprintf(":%v", cfg.ServerPort), r)
 }

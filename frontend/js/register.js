@@ -31,8 +31,4 @@ form.addEventListener("submit", function (event) {
       }
       return response.json();
     })
-    .catch((error) => {
-      console.log("Ошибка регистрации:", error);
-      alert("Произошла ошибка при регистрации!");
-    });
 });

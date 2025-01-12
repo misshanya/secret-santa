@@ -112,6 +112,15 @@ func (a *AuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to generate token", http.StatusInternalServerError)
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Expires:  time.Now().Add(10 * time.Minute),
+		HttpOnly: true,
+		Path:     "/",
+	},
+	)
+
 	json.NewEncoder(w).Encode(tokenString)
 }
 

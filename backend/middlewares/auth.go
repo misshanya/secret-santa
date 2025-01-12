@@ -13,12 +13,21 @@ import (
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Authorization"] == nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
+		var tokenString string
+
+		authHeader := r.Header.Get("Authorization")
+
+		if authHeader != "" {
+			tokenString = getTokenFromHeader(authHeader)
+		} else {
+			cookie, err := r.Cookie("token")
+			if err != nil {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			tokenString = cookie.Value
 		}
 
-		tokenString := getTokenFromHeader(r.Header.Get("Authorization"))
 		token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

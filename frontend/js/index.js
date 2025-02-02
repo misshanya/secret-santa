@@ -29,3 +29,19 @@ function updateHeader() {
 }
 
 window.onload = fetchUserData;
+
+if (localStorage.getItem("user")) {
+  const roomCreationContainer = document.getElementById("room-creation");
+  roomCreationContainer.innerHTML = `
+        <h3>Создание комнаты</h3>
+        <form id="room-creation-form">
+          <label for="name">Название комнаты</label>
+          <input type="text" name="name" id="name" />
+
+          <label for="description">Описание комнаты</label>
+          <input type="text" name="description" id="description" />
+
+          <button type="submit">Создать</button>
+        </form>
+  `;
+}

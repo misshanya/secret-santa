@@ -4,7 +4,7 @@ function fetchUserData() {
         if (response.ok) {
             return response.json();
         }
-        throw new Error("User not logged in")
+        window.location.href = "/login.html"
     })
     .then(data => {
         localStorage.setItem("user", JSON.stringify(data));
@@ -17,12 +17,12 @@ function updateHeader() {
     const user = JSON.parse(localStorage.getItem("user"));
     const userInfoContainer = document.getElementById("user-info");
 
-    if (user) {
-        userInfoContainer.innerHTML = `
+  if (user) {
+    userInfoContainer.innerHTML = `
             <span>Привет, ${user.name}!</span>
         `;
-    } else {
-        userInfoContainer.innerHTML = `
+  } else {
+    userInfoContainer.innerHTML = `
         <button onclick="window.location.href='/login.html'">Войти</button>
         `;
     }

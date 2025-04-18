@@ -13,10 +13,10 @@ services:
       - database
 
     restart: unless-stopped
-    
+
     networks:
       - santa-network
-    
+
   database:
     image: postgres
 
@@ -24,30 +24,9 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=santa
-    
+
     volumes:
       - db_data:/var/lib/postgresql/data
-
-    networks:
-      - santa-network
-
-  frontend:
-    build: ./frontend
-
-    networks:
-      - santa-network
-  
-  nginx:
-    image: nginx:latest
-
-    ports: 80:80
-
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-
-    depends_on:
-      - backend
-      - frontend
 
     networks:
       - santa-network
